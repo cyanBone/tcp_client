@@ -64,6 +64,8 @@ func (self *Connection) Listen(addr string, auth *proxy.Auth) error {
 		self.onOpenCallback()
 		self.read()
 	}
+
+	return nil
 }
 
 func (self *Connection) read() {
