@@ -3,6 +3,8 @@ package tcp_client
 import (
 	"bufio"
 	"net"
+
+	"golang.org/x/net/proxy"
 )
 
 type Connection struct {
@@ -39,8 +41,18 @@ func (self *Connection) WriteString(message string) {
 	self.Conn.Write([]byte(message))
 }
 
-func (self *Connection) Listen() {
-	conexao, err := net.Dial("tcp", self.Address)
+func (self *Connection) Listen(addr string, auth *proxy.Auth) error {
+	var conexao net.Conn
+	var err error
+	if addr != "" {
+		socks5, err := proxy.SOCKS5("tcp", addr, auth, proxy.Direct)
+		if err != nil {
+			return err
+		}
+		conexao, err = socks5.Dial("tcp", self.Address)
+	}else {
+		conexao, err = net.Dial("tcp", self.Address)
+	}
 
 	if err != nil {
 		self.onErrorCallback(err)
