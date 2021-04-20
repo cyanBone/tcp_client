@@ -57,7 +57,11 @@ func (self *Connection) Listen(addr string, auth *proxy.Auth) error {
 	if err != nil {
 		self.onErrorCallback(err)
 	} else {
-		defer conexao.Close()
+		defer func() {
+			if conexao != nil {
+				conexao.Close()
+			}
+		}()
 		self.Conn = conexao
 
 		self.Connected = true
